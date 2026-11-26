@@ -1,0 +1,1219 @@
+BOSHQARUV 365 — YAKUNIY TEXNIK TOPSHIRIQ VA TIZIM ARXITEKTURASI
+Boshlang‘ich konfiguratsiya tasdiqlandi
+Loyiha quyidagi tanlovlar asosida ishlab chiqiladi:
+Yo‘nalish	Tanlangan konfiguratsiya
+Autentifikatsiya	Password — login va parol
+Topshiriq yo‘naltirish	Flexible — vertikal, to‘g‘ridan-to‘g‘ri va ko‘p tashkilotli
+Yakuniy tasdiqlash	Separate — ijroni tekshiruvchi va yakuniy tasdiqlovchi alohida
+Administrator modeli	Central — markaziy tizim administratori
+Joylashtirish	Private — yopiq xususiy infratuzilma
+
+Quyidagi hujjat dasturchilar, loyiha arxitektorlari, UI/UX dizaynerlar va buyurtmachi uchun yagona texnik asos bo‘lib xizmat qiladi.
+
+Asosiy tamoyil: BOSHQARUV 365 shunchaki topshiriqlar yuboriladigan mobil ilova emas. U tashkilotlar o‘rtasidagi vakolatlar, topshiriqlar, ijro, nazorat, rasmiy yozishmalar, hujjatlar, tahlil va audit jarayonlarini yagona boshqaruv muhitida birlashtiradigan platforma bo‘ladi.
+1. Tizimning umumiy arxitekturasi
+BOSHQARUV 365
+Yagona raqamli boshqaruv va nazorat platformasi
+1. FOYDALANUVCHILAR VA VAKOLATLAR
+Hokim / Rahbar
+
+
+O‘rinbosar
+
+
+Bo‘lim boshlig‘i
+
+
+Mas’ul xodim
+
+
+Ijrochi
+
+
+Markaziy administrator
+
+
+
+
+
+2. FOYDALANISH KANALLARI
+Android ilova
+
+
+Web platforma
+
+
+Admin panel
+
+
+
+
+
+3. BACKEND COMMAND ENGINE
+Autentifikatsiya
+
+
+RBAC / ABAC
+
+
+Workflow Engine
+
+
+Task Engine
+
+
+Notification Engine
+
+
+Document Engine
+
+
+Audit Engine
+
+
+AI Control Engine
+
+
+Integration API
+
+
+
+
+
+4. ASOSIY BIZNES MODULLAR
+Topshiriqlar va ijro nazorati
+
+
+Tashkiliy tuzilma
+
+
+Diagonal rasmiy aloqa
+
+
+Loyihalar va yo‘l xaritalari
+
+
+GIS va hududiy muammolar
+
+
+Hisobotlar va KPI
+
+
+
+
+
+5. MA’LUMOTLAR VA INFRASTRUKTURA
+Markaziy ma’lumotlar bazasi
+
+
+Hujjatlar va dalillar ombori
+
+
+O‘zgarmas audit tarixi
+
+
+Xabarlar navbati
+
+
+GIS ma’lumotlari
+
+
+Backup va Recovery
+
+
+
+
+
+KESISHUVCHI QATLAMLAR
+- AI Control Center — barcha ruxsat etilgan jarayonlarni tahlil qiladi.
+- Audit Engine — barcha muhim harakatlarni qayd etadi.
+- Security Layer — har bir so‘rovda foydalanuvchi vakolatini tekshiradi.
+
+
+Arxitektura modular monolit yoki aniq chegaralangan servislar shaklida qurilishi mumkin. Dastlabki bosqichda modular monolit ma’qul: yagona tranzaksion ma’lumotlar bazasi, alohida modullar va keyinchalik servislarni ajratish imkoniyati. Mobil ilova yoki frontend hech qachon ruxsat va biznes qoidalarining yagona manbai bo‘lmaydi — yakuniy tekshiruv backendda bajariladi.
+2. Tizimning asosiy biznes mantiqi
+2.1. Tashkiliy tuzilma
+Tizimda tashkilotlar ierarxiyasi bo‘ladi:
+1. Markaziy boshqaruv organi.
+2. Boshqarma va tashkilotlar.
+3. Bo‘limlar.
+4. Hududiy bo‘linmalar.
+5. MFY va boshqa quyi hududiy birliklar.
+6. Lavozimlar va xodimlar.
+Har bir xodim quyidagi ma’lumotlarga ega bo‘ladi:
+- F.I.Sh. va identifikator;
+- login va parol holati;
+- tashkilot, bo‘lim va lavozim;
+- rahbar va bevosita bo‘ysunuvchilar;
+- biriktirilgan hudud;
+- faoliyat yo‘nalishi;
+- global rollari;
+- ma’lumot ko‘rish doirasi;
+- akkaunt holati;
+- vakolat boshlanish va tugash sanasi.
+Muhim qoida: tashkilotdagi lavozim avtomatik ravishda barcha tizim vakolatlarini bermaydi. Lavozim, tizim roli va aniq topshiriqdagi vakolat alohida boshqariladi.
+2.2. Topshiriq yaratish
+Topshiriq yaratishda foydalanuvchi quyidagilarni kiritadi:
+Maydon	Talab
+Topshiriq nomi	Majburiy
+Batafsil mazmun	Majburiy
+Asos hujjat	Zarur bo‘lsa fayl yoki hujjat raqami
+Topshiriq turi	Vertikal, diagonal, loyiha, hududiy
+Ustuvorlik	Past, odatiy, yuqori, shoshilinch
+Maxfiylik	Ochiq, xizmat doirasida, maxfiy
+Tashkilot	Majburiy
+Mas’ul shaxs	Majburiy
+Ijrochi	Bir yoki bir nechta
+Nazoratchi	Majburiy
+Yakuniy tasdiqlovchi	Vakolatli shaxs
+Boshlanish sanasi	Majburiy
+Yakuniy muddat	Majburiy
+Kutilayotgan natija	Majburiy
+Hisobot formati	Matn, hujjat, foto, video, koordinata yoki jadval
+Eslatma va bosqichlar	Zaruratga ko‘ra
+
+Topshiriq yuborilgach tizim yagona ID yaratadi, masalan:
+
+B365-2026-000125
+
+Topshiriqni yaratgan shaxs, uni bajaradigan shaxs va nazorat qiladigan shaxs alohida qayd etiladi.
+2.3. Topshiriq kimga yuboriladi?
+Flexible yo‘naltirish tizimida uchta asosiy yo‘nalish bo‘ladi:
+A. Vertikal yo‘naltirish
+Hokim / Rahbar
+
+O‘rinbosar
+
+Bo‘lim boshlig‘i
+
+Mas’ul / Ijrochi
+Har bir pog‘onada topshiriqni qabul qilish, qayta yo‘naltirish yoki ijroga tayinlash vakolatlari alohida belgilanadi.
+
+B. To‘g‘ridan-to‘g‘ri yo‘naltirish
+Vakolatli topshiriq beruvchi
+
+Boshqa tashkilot / bo‘lim / mas’ul
+Faqat tegishli yo‘nalish, hudud va vakolat doirasida. Tashkiliy bo‘ysunuvni o‘zgartirmaydi.
+
+C. Ko‘p tashkilotli topshiriq
+Bitta umumiy topshiriq
+1-tashkilot
+
+Alohida ijro
+
+
+2-tashkilot
+
+Alohida ijro
+
+
+3-tashkilot
+
+Alohida ijro
+
+
+
+Har bir tashkilot o‘ziga tegishli vazifa, mas’ul, muddat va natijaga ega bo‘ladi. Umumiy topshiriq esa barcha qismlar tasdiqlangach yakunlanadi.
+
+Yo‘naltirishda tizim quyidagilarni tekshiradi:
+1. Topshiriq beruvchi ushbu tashkilot yoki yo‘nalishga topshiriq yuborish huquqiga egami?
+2. Tanlangan mas’ul xodim faolmi?
+3. U ushbu hudud yoki yo‘nalishga biriktirilganmi?
+4. Topshiriq maxfiylik darajasi qabul qiluvchining ruxsatiga mosmi?
+5. Yakuniy tasdiqlovchi tegishli vakolatga egami?
+6. Topshiriq muddati va bajarish imkoniyati mantiqan to‘g‘rimi?
+Agar shartlardan biri bajarilmasa, tizim yuborishni rad etadi va sababini ko‘rsatadi.
+2.4. Topshiriqni qabul qilish
+Ijrochi topshiriqni olgach uchta asosiy harakatni bajarishi mumkin:
+- Qabul qilish — topshiriqni bajarishga kirishadi.
+- Aniqlashtirish so‘rash — mazmun, muddat yoki natija bo‘yicha izoh talab qiladi.
+- E’tiroz bildirish — vakolat, noto‘g‘ri biriktirish yoki bajarish imkoniyati yuzasidan asoslangan murojaat yuboradi.
+E’tiroz topshiriqni avtomatik bekor qilmaydi. Vakolatli topshiriq beruvchi yoki belgilangan ko‘rib chiquvchi qaror qabul qiladi.
+
+Topshiriq qabul qilingach, ijrochi uni bajarish jarayonini boshlaydi. Qabul qilish muddati tizim siyosati orqali belgilanadi. Qabul qilinmagan topshiriqlar bo‘yicha avtomatik eslatma va eskalatsiya ishlaydi.
+2.5. Ijro va monitoring
+Ijrochi topshiriq bo‘yicha:
+- bajarilgan ishlar haqida ma’lumot kiritadi;
+- oraliq natijalarni joylaydi;
+- hujjat va dalillarni biriktiradi;
+- muammo va to‘siqlarni qayd qiladi;
+- zarur bo‘lsa muddatni uzaytirishni so‘raydi;
+- topshiriqni yakuniy tekshiruvga yuboradi.
+Monitoring tizimi quyidagilarni kuzatadi:
+Nazorat ko‘rsatkichi	Tizim harakati
+Qabul qilinmadi	Eslatma va eskalatsiya
+Ijro boshlanmadi	Kechikish xavfi
+Muddat yaqinlashdi	Ogohlantirish
+Muddat o‘tdi	Overdue holati
+Hisobot yuborildi	Tekshiruvga o‘tadi
+Dalil yetarli emas	Qayta ishlashga qaytariladi
+Tekshiruvchi kechiktirdi	Nazoratchiga eslatma
+Yakuniy tasdiq kutmoqda	Tasdiqlovchiga xabar
+
+Asosiy qoida: ijrochi o‘z topshirig‘ini yakuniy yopmaydi. U natijani topshiradi. Nazoratchi natijani tekshiradi. Yakuniy tasdiqlovchi esa alohida qaror bilan topshiriqni yopadi.
+2.6. Tekshirish va yakuniy tasdiqlash
+IJROCHI
+
+Natija va dalillarni yuboradi
+
+
+NAZORATCHI / REVIEWER
+
+Mazmun, sifat, dalil va talabga muvofiqlikni tekshiradi
+
+QAYTA ISHLASH
+
+Sabab bilan ijrochiga qaytarish
+
+
+TEKSHIRILDI
+
+Tasdiqlashga tavsiya
+
+
+
+
+YAKUNIY TASDIQLOVCHI
+
+Mustaqil ravishda tasdiqlaydi yoki asosli rad etadi
+
+
+COMPLETED
+TOPSHIRIQ YAKUNLANDI
+
+
+Reviewer va final approver bir xil shaxs bo‘lishi mumkin emas. Tizim bu qoida buzilishiga yo‘l qo‘ymaydi. Yakuniy tasdiqlovchi reviewer xulosasini ko‘radi, ammo o‘z vakolati doirasida qaror qabul qiladi.
+3. Workflow State Machine — topshiriq holatlari
+Topshiriqning holati tizimdagi eng muhim mexanizmlardan biri. Har bir holatning aniq ma’nosi, unga o‘tish sharti va ruxsat etilgan foydalanuvchisi bo‘ladi.
+3.1. Asosiy holatlar
+Kod	Holat	Ma’nosi
+DRAFT	Qoralama	Hali yuborilmagan
+ASSIGNED	Biriktirildi	Mas’ul va ijrochilar tayinlangan
+NOTIFIED	Xabardor qilindi	Qabul qiluvchilarga xabar yetkazilgan
+ACCEPTED	Qabul qilindi	Mas’ul topshiriqni qabul qilgan
+IN_PROGRESS	Jarayonda	Ijro boshlangan
+SUBMITTED	Natija yuborildi	Ijrochi hisobot topshirgan
+REVIEW	Tekshiruvda	Reviewer tekshirmoqda
+REWORK	Qayta ishlashda	Natija kamchilik bilan qaytarilgan
+APPROVAL_PENDING	Tasdiq kutilmoqda	Reviewer tekshirgan, final approver qarori kutilmoqda
+COMPLETED	Yakunlandi	Yakuniy tasdiq berilgan
+ARCHIVED	Arxivlandi	Yakunlangan topshiriq arxivga o‘tkazilgan
+ON_HOLD	To‘xtatib turilgan	Vakolatli shaxs vaqtincha to‘xtatgan
+EXTENSION_REQUESTED	Muddat so‘ralgan	Uzaytirish bo‘yicha ariza mavjud
+ESCALATED	Eskalatsiya	Yuqori nazoratga chiqarilgan
+CANCELLED	Bekor qilingan	Vakolatli qaror bilan bekor qilingan
+REJECTED	Rad etilgan	Topshiriqni qabul qilish yoki ko‘rib chiqish rad etilgan
+
+3.2. Holatlar o‘rtasidagi o‘tish
+DRAFT
+
+Qoralama
+
+
+ASSIGNED → NOTIFIED
+
+Biriktirildi va xabardor qilindi
+
+
+ACCEPTED → IN_PROGRESS
+
+Qabul qilindi va ijro boshlandi
+
+
+SUBMITTED → REVIEW
+
+Natija yuborildi va tekshiruv boshlandi
+
+REWORK
+
+Kamchiliklar tuzatiladi
+
+
+IN_PROGRESS
+
+
+APPROVAL_PENDING
+
+Yakuniy tasdiq kutiladi
+
+
+COMPLETED
+
+
+
+
+ARCHIVED
+
+
+ON_HOLD, EXTENSION_REQUESTED va ESCALATED asosiy jarayonga ta’sir qiluvchi alohida boshqaruv holatlari sifatida ishlaydi. CANCELLED va REJECTED yakunlovchi holatlardir.
+
+3.3. O‘tish qoidalari
+Hozirgi holat	Keyingi holat	Kim amalga oshiradi	Shart
+DRAFT	ASSIGNED	Yaratgan / vakolatli beruvchi	Majburiy maydonlar to‘ldirilgan
+ASSIGNED	NOTIFIED	Tizim	Xabar yuborish navbatiga qo‘yilgan
+NOTIFIED	ACCEPTED	Mas’ul / ijrochi	Qabul qilish
+NOTIFIED	REJECTED	Qabul qiluvchi	Asosli rad va vakolatli ko‘rib chiqish
+ACCEPTED	IN_PROGRESS	Mas’ul / ijrochi	Ijro boshlanishi
+IN_PROGRESS	SUBMITTED	Mas’ul / ijrochi	Natija va talab etilgan dalillar mavjud
+SUBMITTED	REVIEW	Tizim / reviewer	Tekshiruvga topshirilgan
+REVIEW	REWORK	Reviewer	Kamchilik va sabab ko‘rsatilgan
+REWORK	IN_PROGRESS	Mas’ul / ijrochi	Tuzatish qayta boshlangan
+REVIEW	APPROVAL_PENDING	Reviewer	Tekshiruv ijobiy
+APPROVAL_PENDING	COMPLETED	Final approver	Yakuniy tasdiq
+COMPLETED	ARCHIVED	Tizim / arxiv vakili	Arxivlash siyosati bajarilgan
+
+Qo‘shimcha qoidalar:
+- ON_HOLD ga o‘tishda sabab, boshlanish sanasi va qayta boshlash sharti talab qilinadi.
+- EXTENSION_REQUESTED holatida eski muddat o‘zgarishsiz qoladi. Tasdiqlangandagina yangi muddat kuchga kiradi.
+- ESCALATED holati topshiriqni bekor qilmaydi va ijroni avtomatik to‘xtatmaydi.
+- CANCELLED faqat vakolatli shaxsning asosli qarori bilan beriladi.
+- COMPLETED holatidan oddiy foydalanuvchi qayta ocholmaydi. Xato aniqlansa, alohida qayta ko‘rib chiqish jarayoni ochiladi.
+- Arxivlangan topshiriqni tahrirlash mumkin emas. Faqat ruxsat etilgan qo‘shimcha hujjat yoki audit yozuvi kiritilishi mumkin.
+Texnik talab: har bir holat o‘zgarishi serverda tranzaksiya orqali bajariladi. Frontenddagi tugmani yashirishning o‘zi xavfsizlik hisoblanmaydi.
+4. RBAC / ABAC — vakolatlar va kirish matritsasi
+Tizimda ikki xil nazorat birgalikda ishlaydi:
+- RBAC: foydalanuvchining tizimdagi roli qanday amallarni bajarishga ruxsat berishini belgilaydi.
+- ABAC: foydalanuvchi, ma’lumot, topshiriq va muhit atributlariga qarab aynan qaysi obyektga kirish mumkinligini belgilaydi.
+4.1. Rollar
+Rol	Vazifasi
+SUPER_ADMIN	Tizimning markaziy administratori
+RAHBAR	Tashkilot yoki boshqaruv darajasidagi rahbar
+DEPUTY	Yo‘nalish bo‘yicha nazorat qiluvchi
+DEPARTMENT_HEAD	Bo‘lim boshlig‘i
+TASK_CREATOR	Topshiriq yaratuvchi / beruvchi
+TASK_RESPONSIBLE	Umumiy natija uchun mas’ul
+TASK_ASSIGNEE	Bevosita ijrochi
+TASK_REVIEWER	Ijroni tekshiruvchi
+TASK_APPROVER	Yakuniy tasdiqlovchi
+OBSERVER	Ruxsat doirasida kuzatuvchi
+AUDITOR	Audit yozuvlarini ko‘ruvchi
+REPORT_ANALYST	Hisobot va tahlil mutaxassisi
+
+Bir xodim bir nechta rolga ega bo‘lishi mumkin, ammo bitta topshiriqda unga berilgan vakolatlar alohida saqlanadi.
+4.2. Asosiy RBAC matritsasi
+Belgilar:
+- ✓ — ruxsat beriladi.
+- O — faqat tegishli vakolat va shart bajarilganda.
+- — — ruxsat yo‘q.
+Amal	Super admin	Rahbar	O‘rinbosar	Bo‘lim boshlig‘i	Ijrochi	Reviewer	Approver	Auditor
+Tashkilot yaratish	✓	—	—	—	—	—	—	—
+Xodim akkauntini boshqarish	✓	O	O	O	—	—	—	—
+Topshiriq yaratish	O	✓	✓	✓	O	—	—	—
+Topshiriq yuborish	O	✓	✓	✓	O	—	—	—
+Mas’ul tayinlash	O	✓	✓	✓	—	—	—	—
+Ijro natijasini yuborish	—	O	O	O	✓	—	—	—
+Dalillarni ko‘rish	O	O	O	O	O	✓	O	O
+Tekshiruvdan o‘tkazish	—	O	O	O	—	✓	—	—
+Qayta ishlashga qaytarish	—	O	O	O	—	✓	—	—
+Yakuniy tasdiqlash	—	O	O	O	—	—	✓	—
+Muddat uzaytirishni tasdiqlash	—	✓	✓	O	—	—	—	—
+Topshiriqni bekor qilish	—	✓	O	O	—	—	—	—
+Auditni ko‘rish	✓	O	O	O	—	—	—	✓
+Vakolat matritsasini o‘zgartirish	✓	—	—	—	—	—	—	—
+
+Bu jadval boshlang‘ich siyosat. O belgilangan amallar uchun tashkilot, hudud, maxfiylik va aniq obyektga oid ABAC shartlari ham bajarilishi kerak.
+4.3. ABAC atributlari
+Atribut	Misol	Tekshiruv vazifasi
+user.organization_id	100	Tashkilot doirasi
+user.department_id	12	Bo‘lim doirasi
+user.territory_id	45	Hududiy doira
+user.position_id	7	Lavozim
+user.clearance_level	2	Maxfiylik darajasi
+user.status	ACTIVE	Akkaunt faolmi
+task.organization_id	100	Topshiriq tashkiloti
+task.confidentiality	INTERNAL	Maxfiylik
+task.assignee_ids	[15, 19]	Ijrochilar
+task.reviewer_id	21	Tekshiruvchi
+task.approver_id	25	Tasdiqlovchi
+task.status	REVIEW	Jarayon holati
+task.territory_id	45	Topshiriq hududi
+
+Misol: bir bo‘lim boshlig‘i faqat o‘z bo‘limiga tegishli va o‘z vakolat doirasidagi topshiriqlarni ko‘radi. Boshqa bo‘lim topshirig‘i unga umumiy rolda mavjudligi sababli avtomatik ochilmaydi. Agar u shu topshiriqqa reviewer sifatida tayinlansa, faqat shu topshiriq bo‘yicha ruxsat oladi.
+4.4. Vakolatlarning uch qatlami
+1. GLOBAL ROLE
+
+Foydalanuvchining platformadagi umumiy roli: administrator, rahbar, xodim va hokazo.
+
+2. DATA SCOPE
+
+Foydalanuvchi ko‘rishi mumkin bo‘lgan tashkilot, bo‘lim, hudud va maxfiylik doirasi.
+
+3. TASK ROLE
+
+Aynan bitta topshiriqdagi beruvchi, mas’ul, ijrochi, reviewer yoki approver vakolati.
+
+Uch qatlam birgalikda tekshiriladi. Bitta qatlamdagi vakolat boshqa qatlam o‘rnini bosa olmaydi.
+
+5. Login, parol va akkaunt boshqaruvi
+Tanlangan autentifikatsiya usuli — login va parol.
+5.1. Akkaunt yaratish
+Markaziy administrator xodim profilini yaratadi va unga tizimga kirish imkoniyatini beradi.
+
+Akkaunt yaratish ketma-ketligi:
+1. Xodim ma’lumotlari kiritiladi.
+2. Tashkilot, bo‘lim va lavozim biriktiriladi.
+3. Global rol va data scope belgilanadi.
+4. Login yaratiladi yoki tizim tomonidan taklif qilinadi.
+5. Foydalanuvchiga parol o‘rnatish uchun xavfsiz, bir martalik faollashtirish havolasi yoki vaqtinchalik maxfiy kod beriladi.
+6. Foydalanuvchi o‘z parolini o‘rnatadi.
+7. Akkaunt faollashtiriladi va birinchi kirish qayd etiladi.
+Administrator foydalanuvchining parolini ko‘ra olmaydi. U faqat parolni qayta o‘rnatish jarayonini boshlashi mumkin.
+5.2. Parol xavfsizligi
+- Parol ochiq matnda saqlanmaydi.
+- Zamonaviy parol xeshlash algoritmi, masalan Argon2id qo‘llanadi.
+- Parolni tiklash tokeni qisqa muddatli, bir martalik va xeshlangan holda saqlanadi.
+- Login urinishlari cheklanadi.
+- Ketma-ket noto‘g‘ri urinishlarda vaqtinchalik bloklash qo‘llanadi.
+- Sessiyalarni bekor qilish imkoniyati bo‘ladi.
+- Xodim ishdan ketganda akkaunt bloklanadi, lekin tarix o‘chirilmaydi.
+- Parol almashtirilganda siyosatga muvofiq boshqa sessiyalar bekor qilinadi.
+MFA hozirgi boshlang‘ich konfiguratsiyada majburiy emas. Lekin tizim arxitekturasi keyinchalik OTP yoki korporativ SSO qo‘shish imkoniyatini saqlashi kerak.
+5.3. Kirish jarayoni
+Login → Password → Server autentifikatsiyasi → Akkaunt holati → Rol va scope yuklanishi → Sessiya yaratish → Bosh sahifa
+
+Agar foydalanuvchining akkaunti bloklangan, muddati tugagan yoki tashkilotdan chiqarilgan bo‘lsa, tizim unga kirishga ruxsat bermaydi.
+
+Ma’lumotga kirish faqat login orqali emas, har bir API so‘rovida qayta tekshiriladi.
+6. Diagonal rasmiy aloqa va hujjat aylanishi
+Topshiriq va rasmiy aloqa bir-biridan farq qiladi.
+- Topshiriq — bajarilishi kerak bo‘lgan ish.
+- Rasmiy aloqa — tashkilotlar o‘rtasidagi so‘rov, javob, ma’lumot almashish yoki kelishuv jarayoni.
+Aloqa holatlari:
+
+DRAFT → SUBMITTED → DELIVERED → ACCEPTED → IN_PROGRESS → RESPONSE_SUBMITTED → REVIEW → COMPLETED → ARCHIVED
+
+Qo‘shimcha holatlar:
+- CLARIFICATION_REQUESTED
+- REJECTED
+- OVERDUE
+- CANCELLED
+Rasmiy aloqa kartasida quyidagilar bo‘ladi:
+- yuboruvchi tashkilot;
+- qabul qiluvchi tashkilot;
+- yuboruvchi mas’ul;
+- qabul qiluvchi mas’ul;
+- nazoratchi;
+- mavzu va mazmun;
+- hujjat raqami va sanasi;
+- asos;
+- javob muddati;
+- ilovalar;
+- javob xati;
+- tasdiqlash tarixi.
+Agar rasmiy xat yoki murojaatdan real ish kelib chiqsa, aloqa kartasidan alohida topshiriq yaratiladi. Ular source_communication_id orqali bog‘lanadi.
+7. Audit Engine — har bir harakatning raqamli izi
+Audit tizimning majburiy va o‘zgarmas qatlamidir.
+
+Har bir muhim harakat quyidagilarni yozib boradi:
+Maydon	Mazmuni
+event_id	Yagona audit ID
+actor_user_id	Harakatni bajargan foydalanuvchi
+action	Amal turi
+object_type	Topshiriq, xodim, hujjat va hokazo
+object_id	Obyekt ID
+old_value	Oldingi qiymat
+new_value	Yangi qiymat
+reason	O‘zgarish sababi
+timestamp	Sana-vaqt
+ip_address	So‘rov manbasi
+session_id	Foydalanuvchi sessiyasi
+result	SUCCESS / DENIED / FAILED
+correlation_id	Bog‘liq so‘rovlar zanjiri
+
+Auditga tushishi shart bo‘lgan voqealar:
+- login va logout;
+- muvaffaqiyatsiz login;
+- parolni tiklash;
+- xodim va rol o‘zgarishi;
+- tashkilot va lavozim o‘zgarishi;
+- topshiriq yaratish va yo‘naltirish;
+- qabul qilish va rad etish;
+- ijro natijasi va dalil yuborish;
+- reviewer xulosasi;
+- final approval;
+- muddat uzaytirish;
+- bekor qilish;
+- maxfiy hujjatni ko‘rish yoki yuklab olish;
+- eksport va hisobot olish;
+- admin sozlamalari;
+- AI tavsiyasi va undan foydalanish.
+Audit yozuvlarini oddiy administrator ham o‘zgartira olmaydi. Ular faqat qo‘shimcha yoziladigan, o‘zgartirish aniqlanadigan mexanizm bilan saqlanadi. Audit yozuvlarining o‘chirilishi, tahrirlanishi yoki yashirilishi tizimning o‘zi tomonidan ham taqiqlanadi.
+8. Ma’lumotlar bazasi modeli
+Tavsiya etiladigan asosiy ma’lumotlar bazasi — PostgreSQL. Geografik ma’lumotlar uchun PostGIS kengaytmasi ishlatiladi. Fayllar alohida yopiq obyektlar omborida saqlanadi. Ma’lumotlar bazasida faylning o‘zi emas, uning metama’lumoti va xavfsiz saqlash identifikatori turadi.
+8.1. Ma’lumotlar bazasining asosiy jadvallari
+Jadval	Vazifasi	Asosiy maydonlar
+organizations	Tashkilotlar	id, parent_id, name, type, status
+departments	Bo‘limlar	id, organization_id, parent_id, name
+positions	Lavozimlar	id, organization_id, name, level
+employees	Xodimlar	id, full_name, pinfl, phone, status
+users	Foydalanuvchilar	id, employee_id, username, password_hash, status
+roles	Rollar	id, code, name
+permissions	Ruxsatlar	id, code, description
+role_permissions	Rol-ruxsat bog‘lanishi	role_id, permission_id
+user_roles	Foydalanuvchi rollari	user_id, role_id, valid_from, valid_to
+user_scopes	Ma’lumot doirasi	user_id, scope_type, scope_id
+sessions	Sessiyalar	id, user_id, token_hash, expires_at
+tasks	Topshiriqlar	id, task_number, title, status, priority
+task_actors	Topshiriq ishtirokchilari	task_id, user_id, actor_role
+task_assignments	Ijro biriktirish	id, task_id, assignee_id, deliverable
+task_dependencies	Bog‘liqliklar	task_id, depends_on_task_id
+task_status_history	Holat tarixi	task_id, old_status, new_status
+task_comments	Izohlar	task_id, user_id, body
+task_extensions	Muddat uzaytirish	task_id, old_deadline, new_deadline
+task_evidence	Ijro dalillari	task_id, file_id, evidence_type
+reviews	Tekshiruvlar	task_id, reviewer_id, decision
+approvals	Yakuniy tasdiqlar	task_id, approver_id, decision
+communications	Rasmiy aloqalar	id, sender_org_id, receiver_org_id, status
+communication_replies	Rasmiy javoblar	communication_id, author_id, body
+documents	Hujjatlar	id, document_number, title, type
+files	Fayllar metama’lumoti	id, storage_key, checksum, mime_type
+projects	Loyihalar	id, name, owner_org_id, status
+project_milestones	Loyiha bosqichlari	project_id, title, deadline
+project_tasks	Loyiha-topshiriq bog‘lanishi	project_id, task_id
+territories	Hududlar	id, parent_id, name, geom
+notifications	Xabarnomalar	id, user_id, type, status
+notification_outbox	Xabarlar navbati	id, event_type, payload, published_at
+audit_events	Audit yozuvlari	id, actor_id, action, object_type, object_id
+ai_insights	AI tahlil natijalari	id, object_type, object_id, insight_type
+system_settings	Tizim sozlamalari	key, value, updated_by
+
+8.2. Muhim jadvallarning batafsil tuzilishi
+Quyidagi sxema dasturchilar uchun boshlang‘ich relatsion modeldir. UUID identifikatorlari, TIMESTAMPTZ vaqt maydonlari va aniq cheklovlar qo‘llanadi.
+
+A. organizations — tashkilotlar
+CREATE TABLE organizations (
+    id UUID PRIMARY KEY,
+    parent_id UUID REFERENCES organizations(id),
+    code VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    organization_type VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+B. users — tizim akkauntlari
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    employee_id UUID NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    failed_login_count INT NOT NULL DEFAULT 0,
+    locked_until TIMESTAMPTZ,
+    password_changed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+C. tasks — topshiriqlar
+CREATE TABLE tasks (
+    id UUID PRIMARY KEY,
+    task_number VARCHAR(40) UNIQUE NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    description TEXT NOT NULL,
+    source_document_id UUID,
+    organization_id UUID NOT NULL,
+    territory_id UUID,
+    parent_task_id UUID,
+    source_communication_id UUID,
+    priority VARCHAR(20) NOT NULL,
+    confidentiality VARCHAR(30) NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    expected_result TEXT NOT NULL,
+    start_at TIMESTAMPTZ,
+    deadline_at TIMESTAMPTZ NOT NULL,
+    completed_at TIMESTAMPTZ,
+    created_by UUID NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+D. task_actors — topshiriqdagi vakolatlar
+CREATE TABLE task_actors (
+    id UUID PRIMARY KEY,
+    task_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    actor_role VARCHAR(30) NOT NULL,
+    assigned_by UUID NOT NULL,
+    valid_from TIMESTAMPTZ NOT NULL,
+    valid_to TIMESTAMPTZ,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+actor_role quyidagi qiymatlarni oladi:
+- CREATOR
+- ASSIGNER
+- RESPONSIBLE
+- ASSIGNEE
+- REVIEWER
+- APPROVER
+- OBSERVER
+- CO_ASSIGNEE
+Bitta topshiriqda bir nechta ijrochi bo‘lishi mumkin. Lekin yakuniy tasdiqlovchi va reviewer rollari uchun tegishli siyosat bo‘yicha yagona faol vakil belgilanadi. Bir nechta tasdiqlovchi zarur bo‘lsa, alohida ketma-ket yoki parallel approval bosqichlari modeli qo‘llanadi.
+
+E. task_status_history — holat o‘zgarishi
+CREATE TABLE task_status_history (
+    id UUID PRIMARY KEY,
+    task_id UUID NOT NULL,
+    from_status VARCHAR(30),
+    to_status VARCHAR(30) NOT NULL,
+    changed_by UUID NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+F. reviews — tekshiruv xulosasi
+CREATE TABLE reviews (
+    id UUID PRIMARY KEY,
+    task_id UUID NOT NULL,
+    reviewer_id UUID NOT NULL,
+    decision VARCHAR(30) NOT NULL,
+    comment TEXT NOT NULL,
+    reviewed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+G. approvals — yakuniy qaror
+CREATE TABLE approvals (
+    id UUID PRIMARY KEY,
+    task_id UUID NOT NULL,
+    approver_id UUID NOT NULL,
+    decision VARCHAR(30) NOT NULL,
+    comment TEXT,
+    approved_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+H. audit_events — audit jurnali
+CREATE TABLE audit_events (
+    id UUID PRIMARY KEY,
+    actor_id UUID,
+    action VARCHAR(100) NOT NULL,
+    object_type VARCHAR(100) NOT NULL,
+    object_id UUID,
+    old_value JSONB,
+    new_value JSONB,
+    reason TEXT,
+    result VARCHAR(20) NOT NULL,
+    ip_address INET,
+    session_id UUID,
+    correlation_id UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+Bu SQL namunaviy boshlang‘ich sxema. Ishlab chiqarish uchun qo‘shimcha foreign key, check constraint, indeks, partition, ma’lumotlarni saqlash muddati va migration skriptlari ishlab chiqilishi shart.
+8.3. Jadval munosabatlari
+#chatgpt-mermaid-_r_3qq_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_3qq_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_3qq_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_3qq_ .error-icon{fill:rgb(48, 48, 48);}#chatgpt-mermaid-_r_3qq_ .error-text{fill:rgb(237, 237, 237);stroke:rgb(237, 237, 237);}#chatgpt-mermaid-_r_3qq_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_3qq_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_3qq_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_3qq_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_3qq_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_3qq_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_3qq_ .marker{fill:rgb(175, 175, 175);stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_3qq_ .marker.cross{stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_3qq_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;}#chatgpt-mermaid-_r_3qq_ p{margin:0;}#chatgpt-mermaid-_r_3qq_ .entityBox{fill:rgb(9, 23, 44);stroke:rgb(31, 78, 148);}#chatgpt-mermaid-_r_3qq_ .relationshipLabelBox{fill:rgb(48, 48, 48);opacity:0.7;background-color:rgb(48, 48, 48);}#chatgpt-mermaid-_r_3qq_ .relationshipLabelBox rect{opacity:0.5;}#chatgpt-mermaid-_r_3qq_ .labelBkg{background-color:rgba(48, 48, 48, 0.5);}#chatgpt-mermaid-_r_3qq_ .edgeLabel{background-color:rgb(0, 0, 0);}#chatgpt-mermaid-_r_3qq_ .edgeLabel .label rect{fill:rgb(0, 0, 0);}#chatgpt-mermaid-_r_3qq_ .edgeLabel .label text{fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_3qq_ .edgeLabel .label{fill:rgb(31, 78, 148);font-size:14px;}#chatgpt-mermaid-_r_3qq_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_3qq_ .edge-pattern-dashed{stroke-dasharray:8,8;}#chatgpt-mermaid-_r_3qq_ .node rect,#chatgpt-mermaid-_r_3qq_ .node circle,#chatgpt-mermaid-_r_3qq_ .node ellipse,#chatgpt-mermaid-_r_3qq_ .node polygon{fill:rgb(9, 23, 44);stroke:rgb(31, 78, 148);stroke-width:1px;}#chatgpt-mermaid-_r_3qq_ .relationshipLine{stroke:rgb(175, 175, 175);stroke-width:1px;fill:none;}#chatgpt-mermaid-_r_3qq_ .marker{fill:none!important;stroke:rgb(175, 175, 175)!important;stroke-width:1;}#chatgpt-mermaid-_r_3qq_ [data-look=neo].labelBkg{background-color:rgba(48, 48, 48, 0.5);}#chatgpt-mermaid-_r_3qq_ .node .neo-node{stroke:rgb(31, 78, 148);}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_3qq_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_3qq_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_3qq_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_3qq_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].node .neo-line path{stroke:rgb(31, 78, 148);filter:none;}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_3qq_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_3qq_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3qq_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_3qq_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_3qq_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";}ORGANIZATIONSDEPARTMENTSEMPLOYEESUSERSUSER_ROLESROLESROLE_PERMISSIONSPERMISSIONSUSER_SCOPESTASKSTASK_ACTORSTASK_ASSIGNMENTSTASK_STATUS_HISTORYTASK_EVIDENCEREVIEWSAPPROVALSTASK_COMMENTSCOMMUNICATIONSCOMMUNICATION_REPLIESDOCUMENTSFILESNOTIFICATIONSAUDIT_EVENTScontainsemploysincludesaccountassignedgrantscontainsdefineslimited_byownshasparticipatesdelegatestracksprovesreviewedapproveddiscussedreceivescreatessupportsstoresreceivesperforms
+
+
+
+
+
+8.4. Ma’lumotlar yaxlitligi bo‘yicha qat’iy talablar
+1. Har bir topshiriqning unikal raqami bo‘lishi shart.
+2. Bitta topshiriq uchun barcha ishtirokchilar tarixda saqlanishi kerak.
+3. Xodim ishdan ketganda uning eski topshiriqlardagi ishtiroki o‘chirilmasligi kerak.
+4. Topshiriqni qayta biriktirishda avvalgi ijrochi va yangi ijrochi tarixi saqlanishi kerak.
+5. Bir topshiriqning holati parallel so‘rovlar sababli buzilmasligi kerak.
+6. Yakuniy tasdiq reviewer xulosasiga bog‘langan bo‘lishi kerak.
+7. Bir foydalanuvchi o‘zining tekshiruv yoki tasdiqlash vakolatini o‘zi bera olmaydi.
+8. Fayllar uchun checksum hisoblanishi va virus tekshiruvi bajarilishi kerak.
+9. O‘chirish o‘rniga archived_at, deleted_at yoki status orqali yumshoq o‘chirish qo‘llanadi; audit va qonuniy saqlash majburiyatlari alohida bajariladi.
+10. Har bir tashkilot va hudud bilan bog‘liq ma’lumotlar ABAC siyosati asosida cheklanadi.
+9. API va backend xizmatlari
+Backend API barcha mobil va web interfeyslar uchun yagona biznes qoidalarining manbai bo‘ladi.
+
+Tavsiya etiladigan API tuzilmasi:
+Modul	Endpoint namunalari	Vazifasi
+Auth	/api/v1/auth/login	Login
+Auth	/api/v1/auth/logout	Chiqish
+Auth	/api/v1/auth/password/reset	Parol tiklash
+Users	/api/v1/users	Xodimlar va akkauntlar
+Organizations	/api/v1/organizations	Tashkilotlar
+Tasks	/api/v1/tasks	Topshiriqlar
+Tasks	/api/v1/tasks/{id}/accept	Qabul qilish
+Tasks	/api/v1/tasks/{id}/submit	Natija yuborish
+Tasks	/api/v1/tasks/{id}/reassign	Qayta biriktirish
+Tasks	/api/v1/tasks/{id}/extend	Muddat so‘rash
+Reviews	/api/v1/tasks/{id}/review	Tekshiruv xulosasi
+Approvals	/api/v1/tasks/{id}/approve	Yakuniy tasdiq
+Communications	/api/v1/communications	Rasmiy aloqalar
+Documents	/api/v1/documents	Hujjatlar
+Reports	/api/v1/reports	Hisobotlar
+Audit	/api/v1/audit-events	Audit
+AI	/api/v1/ai/insights	AI tahlillari
+
+Har bir API quyidagi talabga amal qiladi:
+- autentifikatsiya;
+- server tomonda RBAC va ABAC tekshiruvi;
+- so‘rov parametrlarini tekshirish;
+- ma’lumotlar yaxlitligi;
+- audit yozuvi;
+- kerakli javob kodi va xato tavsifi;
+- API versiyalash;
+- tezlik cheklovi;
+- takroriy so‘rovlarni boshqarish.
+Masalan, /tasks/{id}/approve endpointi faqat tugmani bosgan foydalanuvchining TASK_APPROVER vakolati borligi bilan ishlamaydi. Server uning aynan shu topshiriqqa tayinlanganini, faol ekanini, reviewer xulosasi ijobiy ekanini, approver reviewer bilan bir shaxs emasligini va topshiriqning holati APPROVAL_PENDING ekanini ham tekshiradi.
+10. Notification Engine — xabarnomalar
+Xabarlar quyidagi kanallarda ishlaydi:
+- ilova ichidagi bildirishnomalar;
+- push xabarlar;
+- elektron pochta — infratuzilma va siyosat ruxsat etsa;
+- SMS — alohida integratsiya mavjud bo‘lsa.
+Xabarlar hodisaga bog‘langan bo‘ladi.
+Hodisa	Xabar kimga boradi
+Topshiriq yaratildi	Mas’ul va ijrochilar
+Topshiriq qabul qilindi	Beruvchi va mas’ul
+E’tiroz bildirildi	Beruvchi va nazoratchi
+Muddat yaqinlashdi	Ijrochi, mas’ul, nazoratchi
+Muddat o‘tdi	Mas’ul va yuqori nazorat
+Hisobot yuborildi	Reviewer
+Qayta ishlashga qaytarildi	Ijrochi va mas’ul
+Reviewer tasdiqladi	Final approver
+Yakuniy tasdiq berildi	Barcha tegishli ishtirokchilar
+Topshiriq bekor qilindi	Barcha tegishli ishtirokchilar
+
+Xabar yuborish biznes tranzaksiyasi bilan uzviy bog‘lanadi. Buning uchun notification_outbox modeli qo‘llanadi: topshiriq o‘zgarishi va xabar yuborish hodisasi bir tranzaksiyada yoziladi, xabar esa navbatdan qayta urinishlar bilan yuboriladi. Shu tariqa topshiriq saqlanib, xabar yo‘qolib qolishi xavfi kamayadi.
+11. AI Control Center — sun’iy intellekt nazorati
+AI mustaqil rahbar yoki qaror qabul qiluvchi emas. U mavjud ma’lumotlarni tahlil qilib, vakolatli xodimga xavf, muammo va tavsiyalarni ko‘rsatadi.
+
+Asosiy AI modullari:
+Modul	Vazifasi
+Deadline Radar	Muddati o‘tish xavfini oldindan aniqlash
+Review Monitor	Tekshiruv jarayonidagi kechikishlarni topish
+Evidence AI	Dalil va hisobotlarni tahlil qilish
+Conflict Detector	Qarama-qarshi topshiriqlarni aniqlash
+Workload Intelligence	Xodimlar yuklamasini baholash
+Escalation Predictor	Eskalatsiya ehtimolini baholash
+Executive Briefing	Rahbar uchun qisqa tahliliy ma’lumot tayyorlash
+
+AI natijasi quyidagi maydonlarni o‘z ichiga oladi:
+- tahlil qilingan obyekt;
+- tahlil vaqti;
+- tavsiya turi;
+- aniqlangan xavf;
+- ishonchlilik darajasi;
+- foydalanilgan manbalar;
+- tavsiya etilgan keyingi harakat.
+AIga taqiqlangan vakolatlar:
+- o‘zicha rasmiy topshiriq berish;
+- xodimni ishdan bo‘shatish yoki jazolash;
+- lavozim yoki rol berish;
+- ruxsatlarni o‘zgartirish;
+- topshiriqni mustaqil yakuniy tasdiqlash;
+- foydalanuvchi ruxsati bo‘lmagan ma’lumotni tahlil qilish yoki chiqarish.
+AI xizmatlari yopiq infratuzilmada yoki buyurtmachi tomonidan tasdiqlangan xavfsiz muhitda ishlashi kerak. Maxfiy ma’lumotlar ruxsatsiz tashqi AI xizmatlariga yuborilmaydi.
+12. Private deployment — yopiq infratuzilma
+Tanlangan joylashtirish modeli: davlat tashkilotining yoki buyurtmachi nazoratidagi yopiq server infratuzilmasi.
+PRIVATE INFRASTRUCTURE
+Foydalanuvchilar
+
+Himoyalangan tarmoq / ruxsat etilgan kirish nuqtasi
+
+
+Reverse Proxy / API Gateway
+
+TLS, so‘rov filtri, tezlik cheklovi
+
+
+Backend Application
+
+Auth • Workflow • Tasks • Documents • Audit • AI
+
+
+PostgreSQL
+
+Asosiy baza
+
+
+Object Storage
+
+Fayllar va dalillar
+
+
+Redis / Queue
+
+Kesh va navbatlar
+
+
+Backup Server
+
+Zaxira va tiklash
+
+
+
+
+Barcha serverlar, zaxiralar va monitoring vositalari buyurtmachi tasdiqlagan xavfsizlik siyosatiga muvofiq joylashtiriladi.
+
+Xavfsizlik talablari:
+1. Barcha tarmoq aloqalari TLS orqali shifrlanadi.
+2. Maxfiy ma’lumotlar saqlashda ham shifrlanadi.
+3. Serverlarga administrator kirishi cheklanadi.
+4. Database foydalanuvchilari minimal vakolat bilan ishlaydi.
+5. Backup alohida himoyalangan muhitga olinadi.
+6. Zaxira nusxalari tiklanishi amaliy sinovdan o‘tkaziladi.
+7. Fayllar antivirus va zararli kontent tekshiruvidan o‘tkaziladi.
+8. Server, baza va ilova loglari markazlashgan monitoringda kuzatiladi.
+9. Zaifliklarni tekshirish va yangilash tartibi belgilanadi.
+10. Tizimning tiklanish maqsadlari — RPO va RTO — buyurtmachi bilan kelishiladi.
+13. Markaziy administrator paneli
+Administrator modeli CENTRAL bo‘lgani uchun barcha asosiy tizim sozlamalari markaziy boshqaruv ostida bo‘ladi.
+
+Administrator paneli quyidagi bo‘limlardan tashkil topadi:
+Bo‘lim	Funksiyasi
+Dashboard	Tizimning umumiy holati
+Organization Management	Tashkilot va bo‘limlar
+Employee Management	Xodimlar bazasi
+User Management	Login va akkauntlar
+Role Management	Rollarni boshqarish
+Permission Matrix	Ruxsatlarni boshqarish
+Scope Management	Hudud va tashkilot doiralari
+Workflow Builder	Jarayon qoidalari
+Task Configuration	Topshiriq turlari va shablonlari
+Notification Rules	Xabarnomalar
+Security Center	Xavfsizlik
+Audit Center	Audit yozuvlari
+AI Configuration	AI modullari
+Integration Center	Tashqi tizimlar
+Backup & Recovery	Zaxira va tiklash
+System Settings	Umumiy sozlamalar
+
+Markaziy administratorning chegarasi: u tizimning texnik ishlashi, foydalanuvchi va ruxsatlar konfiguratsiyasini boshqaradi. Lekin rahbarning topshiriq berish, tekshirish yoki yakuniy tasdiqlash vakolatini avtomatik olmaydi. Agar administratorga biznes jarayonida qatnashish kerak bo‘lsa, unga alohida biznes roli va tegishli scope berilishi shart.
+
+Tizimda administratorning o‘zi bajargan har bir o‘zgarish ham auditga yoziladi.
+14. Hisobotlar va boshqaruv analitikasi
+Rahbar uchun boshqaruv paneli faqat raqamlarni ko‘rsatmasligi, balki vaziyatni tez tushunish va qaror qabul qilishga yordam berishi kerak.
+Asosiy dashboard ko‘rsatkichlari
+- jami topshiriqlar;
+- jarayondagi topshiriqlar;
+- muddatidan oldin bajarilgan topshiriqlar;
+- muddati o‘tgan topshiriqlar;
+- tekshiruvda turgan topshiriqlar;
+- yakuniy tasdiq kutilayotgan topshiriqlar;
+- tashkilotlar kesimidagi ijro ko‘rsatkichlari;
+- xodimlar yuklamasi;
+- hududlar kesimidagi muammolar;
+- topshiriqlarni bajarish o‘rtacha muddati;
+- takroriy qaytarishlar;
+- yuqori xavfli topshiriqlar.
+Hisobot filtrlari
+- sana oralig‘i;
+- tashkilot;
+- bo‘lim;
+- hudud;
+- MFY;
+- mas’ul xodim;
+- topshiriq turi;
+- ustuvorlik;
+- holat;
+- maxfiylik darajasi.
+Hisobotlarni PDF, Excel va CSV shaklida eksport qilish mumkin. Eksport qilish ham ruxsat bilan cheklanadi va auditga yoziladi.
+15. 40 ta mobil ekran bilan bog‘lanishi
+Backend arxitekturasi avval belgilangan 40 ta Android ekranini ma’lumot bilan ta’minlaydi. Har bir ekran real API bilan ishlashi kerak.
+Bo‘lim	Ekranlar soni	Asosiy backend moduli
+01. Authentication	3	Auth
+02. Command Center	5	Dashboard / Analytics
+03. Organization & Employees	5	Organization / Users
+04. Tasks & Control	8	Task / Workflow
+05. Diagonal Communication	3	Communication
+06. Projects & GIS	4	Projects / GIS
+07. AI Control Center	4	AI / Analytics
+08. Reports & Analytics	3	Reporting
+09. Documents & Notifications	3	Documents / Notification
+10. Profile & Settings	2	User / Session / Settings
+Jami	40	
+
+Bu 40 ta ekran Figma prototipi bilan cheklanib qolmasligi kerak. Har bir ekran backenddagi aniq modul, ma’lumot modeli va ruxsat siyosatiga bog‘lanadi.
+
+16. Dasturchiga topshiriladigan yakuniy texnik topshiriq
+Quyidagi qism loyihani ishlab chiqish uchun rasmiy texnik topshiriq sifatida foydalanishga mo‘ljallangan.
+BOSHQARUV 365
+Yagona raqamli boshqaruv platformasi
+Development Specification
+Loyihaning maqsadi
+
+Davlat boshqaruvi, tashkilotlararo muvofiqlashtirish, topshiriqlar ijrosi, nazorat, rasmiy hujjat aylanishi va tahliliy boshqaruvni yagona xavfsiz platformaga birlashtirish.
+
+Tasdiqlangan konfiguratsiya
+- Authentication: Password
+- Routing: Flexible
+- Final Approval: Separate
+- Administration: Central
+- Deployment: Private
+
+Asosiy texnik talablar
+1. Android mobil ilova.
+2. Web boshqaruv platformasi.
+3. Markaziy administrator paneli.
+4. Backend Command Engine.
+5. PostgreSQL ma’lumotlar bazasi.
+6. RBAC + ABAC xavfsizlik modeli.
+7. Task Workflow State Machine.
+8. Diagonal Communication Engine.
+9. Audit Engine.
+10. AI Control Center.
+11. GIS va hududiy tahlil.
+12. Private deployment.
+
+16.1. Dasturiy modullar
+Dasturchi quyidagi modullarni alohida mantiqiy chegaralar bilan ishlab chiqishi shart:
+
+M1 — Authentication & Session Management
+- Login va parol orqali kirish.
+- Akkaunt faollashtirish.
+- Parolni tiklash va almashtirish.
+- Sessiyalarni boshqarish.
+- Akkauntni bloklash va faollashtirish.
+- Login tarixini yuritish.
+M2 — Organization Management
+- Tashkilotlar ierarxiyasi.
+- Bo‘limlar.
+- Lavozimlar.
+- Xodimlar.
+- Rahbar va bo‘ysunuvchilar.
+- Hududiy biriktirish.
+M3 — RBAC / ABAC Security
+- Rollar.
+- Ruxsatlar.
+- Foydalanuvchi rollari.
+- Scope.
+- Maxfiylik darajasi.
+- Har bir API uchun ruxsat tekshiruvi.
+- Vaqtinchalik va topshiriqqa xos vakolatlar.
+M4 — Task Management
+- Topshiriq yaratish.
+- Topshiriqni yo‘naltirish.
+- Qabul qilish va e’tiroz.
+- Ijro va hisobot.
+- Dalillar.
+- Tekshirish.
+- Yakuniy tasdiqlash.
+- Bekor qilish va qayta biriktirish.
+- Muddat uzaytirish.
+- Eskalatsiya.
+M5 — Workflow Engine
+- Holatlar.
+- Holatlar o‘rtasidagi ruxsat etilgan o‘tishlar.
+- O‘tish shartlari.
+- Muddat siyosati.
+- Tasdiqlash zanjiri.
+- Tashkilotga qarab sozlanadigan jarayonlar.
+M6 — Communication Engine
+- Rasmiy so‘rovlar.
+- Javob xatlari.
+- Tashkilotlararo yozishmalar.
+- Kelishuv.
+- Hujjatlar bilan bog‘lash.
+- Aloqadan topshiriq yaratish.
+M7 — Document & Evidence Management
+- Hujjatlar reyestri.
+- Fayllar.
+- Dalillar.
+- Versiyalar.
+- Ko‘rish va yuklab olish vakolatlari.
+- Virus tekshiruvi.
+- Elektron imzo integratsiyasi uchun tayyor arxitektura.
+M8 — Notification Engine
+- Ilova bildirishnomalari.
+- Push.
+- Eslatmalar.
+- Muddat ogohlantirishlari.
+- Eskalatsiya xabarlari.
+- Xabarlar navbati.
+M9 — Audit Engine
+- Harakatlar tarixi.
+- O‘zgarishlar tarixi.
+- Kirish tarixi.
+- Xavfsizlik hodisalari.
+- Eksport tarixi.
+- O‘zgarmas audit yozuvlari.
+M10 — AI Control Center
+- Muddat xavfi.
+- Ijro monitoringi.
+- Dalillar tahlili.
+- Qarama-qarshiliklarni aniqlash.
+- Yuklama tahlili.
+- Rahbar uchun tahliliy ma’lumot.
+M11 — Projects & GIS
+- Loyihalar.
+- Bosqichlar.
+- Muddatlar.
+- Mas’ul tashkilotlar.
+- Hududiy muammolar.
+- Xarita va koordinatalar.
+- Loyiha-topshiriq aloqasi.
+M12 — Reporting & Analytics
+- KPI.
+- Tashkilotlar kesimidagi tahlil.
+- Rahbar dashboardi.
+- Xodimlar yuklamasi.
+- Kechikishlar statistikasi.
+- Eksport.
+16.2. Tavsiya etiladigan texnologiyalar
+Qism	Tavsiya
+Android	Flutter
+Web interfeys	React / Next.js yoki ekvivalent
+Backend	Java Spring Boot yoki .NET
+API	REST API, zaruratda WebSocket
+Ma’lumotlar bazasi	PostgreSQL
+GIS	PostGIS
+Kesh	Redis
+Xabarlar navbati	RabbitMQ yoki ekvivalent
+Fayllar ombori	S3-compatible private object storage
+Autentifikatsiya	Backend boshqaradigan login/parol
+Monitoring	Prometheus / Grafana yoki ekvivalent
+Loglar	Markaziy log boshqaruvi
+Deployment	Private server / virtualizatsiya / konteynerlar
+
+Bu texnologiyalar majburiy yagona tanlov emas. Dasturchi boshqa texnologiya taklif qilsa, u xavfsizlik, kengaytirish, texnik xizmat, ma’lumotlarni ko‘chirish va yopiq infratuzilmada ishlash talablarini bajarishi kerak.
+16.3. Majburiy biznes qoidalari
+Dastur quyidagi qoidalarni buzmasligi shart:
+1. Topshiriq yaratilganda yagona ID beriladi.
+2. Topshiriqni yaratgan shaxs avtomatik ravishda uning yakuniy tasdiqlovchisiga aylanmaydi.
+3. Mas’ul, ijrochi, reviewer va approver vakolatlari alohida saqlanadi.
+4. Topshiriqni bevosita yoki vertikal yo‘naltirish faqat vakolat bilan amalga oshiriladi.
+5. Bir nechta tashkilot qatnashgan topshiriqlarda har bir tashkilotning mustaqil ijro qismi bo‘ladi.
+6. Ijrochi topshiriqni yakuniy yopmaydi.
+7. Reviewer va approver alohida shaxs bo‘ladi.
+8. Topshiriq holatlari faqat ruxsat etilgan ketma-ketlikda o‘zgaradi.
+9. Qayta biriktirish avvalgi ijro tarixini o‘chirmaydi.
+10. Muddat uzaytirish tasdiqlanmaguncha eski muddat saqlanadi.
+11. Bekor qilingan topshiriq tarixi saqlanadi.
+12. Xodimning lavozimi yoki tashkiloti o‘zgarsa, uning eski topshiriqlardagi tarixi saqlanadi.
+13. Maxfiylik darajasi har bir so‘rovda tekshiriladi.
+14. Foydalanuvchi boshqa xodimning ID raqamini bilishi orqali uning ma’lumotlarini ko‘ra olmaydi.
+15. Barcha muhim amallar auditga yoziladi.
+16. AI mustaqil rasmiy qaror qabul qilmaydi.
+17. Administrator biznes vakolatlarini avtomatik egallamaydi.
+18. API ruxsatlari mobil va web interfeysdagi ruxsatlardan mustaqil ravishda serverda tekshiriladi.
+19. Topshiriq holati va tegishli audit yozuvi bitta tranzaksiyada saqlanadi.
+20. Takroriy API so‘rovlari natijasida bir topshiriq ikki marta yaratilmasligi uchun idempotency mexanizmi ishlatiladi.
+16.4. Sinov va qabul qilish mezonlari
+Loyiha tayyor deb hisoblanishi uchun faqat ekranlar ochilishi yetarli emas. Quyidagi sinovlardan o‘tishi kerak.
+№	Sinov	Qabul qilish sharti
+1	Login	To‘g‘ri login/parol bilan kirish
+2	Noto‘g‘ri parol	Kirish rad etilishi va urinish qayd etilishi
+3	Rol nazorati	Vakolatsiz foydalanuvchi amal bajara olmasligi
+4	Scope nazorati	Boshqa tashkilot ma’lumoti ochilmasligi
+5	Topshiriq yaratish	ID va audit yozuvi yaratilishi
+6	Yo‘naltirish	Faqat vakolatli manzilga yuborilishi
+7	Qabul qilish	Qabul qiluvchi va vaqt qayd etilishi
+8	Ijro	Natija va dalillar biriktirilishi
+9	Review	Kamchilik bilan qaytarish yoki tekshirish
+10	Approval	Alohida shaxs yakuniy tasdiqlashi
+11	Muddat	Eslatma va kechikish nazorati
+12	Qayta biriktirish	Eski tarix saqlanishi
+13	Audit	Harakatlar izchil qayd etilishi
+14	Fayllar	Ruxsatsiz faylga kirish bloklanishi
+15	Offline / tarmoq uzilishi	Ma’lumot yo‘qolmasligi va takroriy yuborish nazorati
+16	Backup	Zaxiradan tiklash sinovdan o‘tishi
+17	Ko‘p foydalanuvchi	Parallel amallarda ma’lumot buzilmasligi
+18	AI	Ruxsatsiz ma’lumotni ko‘rmasligi va mustaqil qaror chiqarmasligi
+
+Qabul sinovi uchun majburiy ssenariy:
+1. Rahbar yangi topshiriq yaratadi.
+2. Uni boshqa tashkilotning vakolatli mas’uliga yuboradi.
+3. Mas’ul topshiriqni qabul qiladi.
+4. Mas’ul ijrochiga vazifa biriktiradi.
+5. Ijrochi ishni bajarib, foto va hujjat yuklaydi.
+6. Mas’ul natijani tekshiruvga yuboradi.
+7. Reviewer natijani tekshiradi.
+8. Reviewer kamchilik topsa, qayta ishlashga qaytaradi.
+9. Ijrochi kamchilikni tuzatib, qayta yuboradi.
+10. Reviewer ijobiy xulosa beradi.
+11. Final approver alohida kirib yakuniy tasdiq beradi.
+12. Topshiriq COMPLETED holatiga o‘tadi.
+13. Barcha ishtirokchilar topshiriq tarixini ko‘radi.
+14. Auditor barcha o‘zgarishlar zanjirini tekshiradi.
+15. Vakolatsiz boshqa foydalanuvchi topshiriqqa kira olmasligi isbotlanadi.
+16.5. Dasturchi topshirishi shart bo‘lgan natijalar
+- Ishlaydigan Android APK va loyiha source code.
+- Web platforma source code.
+- Markaziy administrator paneli.
+- Backend source code.
+- Ma’lumotlar bazasi ER diagrammasi.
+- SQL migration va seed skriptlari.
+- API hujjatlari (OpenAPI / Swagger).
+- RBAC / ABAC konfiguratsiyasi.
+- Workflow State Machine hujjati.
+- Unit, integration va security testlar.
+- Docker yoki ekvivalent deployment konfiguratsiyasi.
+- Private serverga o‘rnatish yo‘riqnomasi.
+- Backup va Recovery yo‘riqnomasi.
+- Administrator qo‘llanmasi.
+- Foydalanuvchi qo‘llanmasi.
+- Texnik xizmat va yangilash hujjatlari.
+- Figma manba fayli va 40 ta ekran prototipi.
+
+17. Ishlab chiqish bosqichlari
+Loyihani birdaniga barcha funksiyalari bilan ishlab chiqish xavfli. Avval asosiy boshqaruv mexanizmini to‘liq ishlatib, keyin qolgan modullarni qo‘shish kerak.
+1. 1-bosqich — Arxitektura va xavfsizlik
+   
+   Ma’lumotlar bazasi, tashkilotlar ierarxiyasi, login, rollar, ruxsatlar, scope va audit.
+   Poydevor
+2. 2-bosqich — Topshiriqlar va Workflow
+   
+   Topshiriq yaratish, yo‘naltirish, qabul qilish, ijro, review, approval, muddat va eskalatsiya.
+   Asosiy biznes jarayoni
+3. 3-bosqich — Rasmiy aloqa va hujjatlar
+   
+   Diagonal yozishmalar, hujjatlar, javoblar, dalillar, fayllar.
+4. 4-bosqich — Mobil va Web interfeys
+   
+   40 ta ekran, API integratsiyasi, bildirishnomalar, boshqaruv paneli.
+5. 5-bosqich — Hisobot, loyiha va GIS
+   
+   KPI, loyihalar, xaritalar, hududiy monitoring.
+6. 6-bosqich — AI Control Center
+   
+   Xavf tahlili, deadline radar, evidence AI va rahbar uchun tahliliy ma’lumot.
+7. 7-bosqich — Private deployment va qabul sinovlari
+   
+   Xavfsizlik auditi, yuklama sinovi, backup, tiklash va pilot foydalanish.
+18. Loyihada alohida e’tibor talab qiladigan masalalar
+Ishlab chiqish boshlanishidan oldin buyurtmachi bilan quyidagi siyosatlar yozma ravishda tasdiqlanishi kerak:
+1. Tashkiliy vakolatlar: qaysi lavozim qaysi tashkilotga bevosita topshiriq bera oladi?
+2. Yakuniy tasdiqlash: rahbar, o‘rinbosar yoki boshqa vakolatli lavozimlar qaysi turdagi topshiriqlarni tasdiqlaydi?
+3. Muddat siyosati: dam olish kunlari, bayramlar va ish vaqti hisobga olinadimi?
+4. Maxfiylik: qaysi turdagi ma’lumotlar qaysi foydalanuvchilarga ko‘rinadi?
+5. Arxiv: topshiriqlar, hujjatlar va audit yozuvlari qancha muddat saqlanadi?
+6. Elektron imzo: huquqiy ahamiyatga ega yakuniy hujjatlarni elektron imzo bilan tasdiqlash talab qilinadimi?
+7. Integratsiyalar: mavjud davlat axborot tizimlari bilan qanday ma’lumot almashiladi?
+8. Offline rejim: internet bo‘lmagan holatda qaysi amallarni bajarishga ruxsat beriladi?
+Bu bandlar aniq tasdiqlanmasdan turib, dasturchi ularni o‘zicha taxmin qilib ishlab chiqmasligi kerak.
+
+19. Yakuniy arxitektura qarori
+BOSHQARUV 365 quyidagi besh asosiy tamoyilga quriladi:
+Xavfsizlik birinchi o‘rinda
+
+Har bir ma’lumot va amal uchun server darajasida vakolat nazorati.
+
+
+
+Jarayon aniq va izchil
+
+Topshiriq yaratishdan yakuniy tasdiqqacha barcha bosqichlar nazoratda.
+
+
+
+Harakatlar tarixi saqlanadi
+
+Kim, qachon, nima qilgani va qanday qaror qabul qilgani qayd etiladi.
+
+
+
+AI — tahlilchi, inson — qaror qabul qiluvchi
+
+AI xavfni aniqlaydi va tavsiya beradi, rasmiy qaror vakolatli xodimda qoladi.
+
+
+
+Private infratuzilma
+
+Ma’lumotlar va boshqaruv jarayonlari buyurtmachi nazoratidagi muhitda saqlanadi.
